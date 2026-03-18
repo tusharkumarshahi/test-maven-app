@@ -1,0 +1,38 @@
+name: CI — Maven Build and Docker
+
+on:
+  push:
+    branches: [main, develop, feature/docker-test]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Maven Build
+        id: maven
+        uses: tusharkumarshahi/test-mule-actions/.github/actions/maven-build@main
+        with:
+          java-version: '17'
+          skip-tests: 'false'
+
+      - name: Docker Build
+        id: docker
+        uses: tusharkumarshahi/test-mule-actions/.github/actions/docker-build@main
+        with:
+          image-name: 'test-maven-app'
+          image-tag: ${{ github.sha }}
+          push: 'false'
+
+      - name: Summary
+        run: |
+          echo "### Build Summary" >> $GITHUB_STEP_SUMMARY
+          echo "- Artifact : ${{ steps.maven.outputs.artifact-name }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Image    : ${{ steps.docker.outputs.image-full-ref }}" >> $GITHUB_STEP_SUMMARY
