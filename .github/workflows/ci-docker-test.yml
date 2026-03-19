@@ -22,6 +22,19 @@ jobs:
         with:
           java-version: '17'
           skip-tests: 'false'
+      
+      - name: Determine Version        
+        id: version
+        run: |
+          VERSION=$(mvn help:evaluate \
+            -Dexpression=project.version \
+            -q -DforceStdout)
+          SHORT_SHA=$(echo "${{ github.sha }}" \
+            | cut -c1-7)
+          echo "tag=${VERSION}-${SHORT_SHA}" \
+            >> $GITHUB_OUTPUT
+          echo "Resolved tag: ${VERSION}-${SHORT_SHA}"
+    
 
       - name: Docker Build
         id: docker
