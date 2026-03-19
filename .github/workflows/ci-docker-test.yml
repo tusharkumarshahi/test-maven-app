@@ -41,7 +41,7 @@ jobs:
         uses: tusharkumarshahi/test-mule-actions/.github/actions/docker-build@main
         with:
           image-name: 'test-maven-app'
-          image-tag: ${{ github.sha }}
+          image-tag: ${{ steps.version.outputs.tag }}
           push: 'true'
           acr-login-server: ${{ secrets.ACR_LOGIN_SERVER }}
           acr-username: ${{ secrets.ACR_USERNAME }}
