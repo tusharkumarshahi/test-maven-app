@@ -29,7 +29,10 @@ jobs:
         with:
           image-name: 'test-maven-app'
           image-tag: ${{ github.sha }}
-          push: 'false'
+          push: 'true'
+          acr-login-server: ${{ secrets.ACR_LOGIN_SERVER }}
+          acr-username: ${{ secrets.ACR_USERNAME }}
+          acr-password: ${{ secrets.ACR_PASSWORD }}
 
       - name: Summary
         run: |
