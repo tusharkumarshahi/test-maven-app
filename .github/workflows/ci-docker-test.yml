@@ -1,54 +1,29 @@
-name: CI — Maven Build and Docker
+name: CI — Docker Build Test
 
 on:
   push:
-    branches: [main, develop, feature/docker-test]
-  pull_request:
     branches: [main]
   workflow_dispatch:
 
 jobs:
-  build:
+  docker:
+    name: Docker Build
     runs-on: ubuntu-latest
 
     steps:
 
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
-      - name: Maven Build
-        id: maven
-        uses: tusharkumarshahi/test-mule-actions/.github/actions/maven-build@main
+      - name: Set up Java 17
+        uses: actions/setup-java@v5
         with:
+          distribution: 'temurin'
           java-version: '17'
-          skip-tests: 'false'
-      
-      - name: Determine Version        
-        id: version
-        run: |
-          VERSION=$(mvn help:evaluate \
-            -Dexpression=project.version \
-            -q -DforceStdout)
-          SHORT_SHA=$(echo "${{ github.sha }}" \
-            | cut -c1-7)
-          echo "tag=${VERSION}-${SHORT_SHA}" \
-            >> $GITHUB_OUTPUT
-          echo "Resolved tag: ${VERSION}-${SHORT_SHA}"
-    
+          cache: 'maven'
 
-      - name: Docker Build
-        id: docker
-        uses: tusharkumarshahi/test-mule-actions/.github/actions/docker-build@main
-        with:
-          image-name: 'test-maven-app'
-          image-tag: ${{ steps.version.outputs.tag }}
-          push: 'true'
-          acr-login-server: ${{ secrets.ACR_LOGIN_SERVER }}
-          acr-username: ${{ secrets.ACR_USERNAME }}
-          acr-password: ${{ secrets.ACR_PASSWORD }}
+      - name: Maven build
+        run: mvn clean package -B -DskipTests=true
 
-      - name: Summary
-        run: |
-          echo "### Build Summary" >> $GITHUB_STEP_SUMMARY
-          echo "- Artifact : ${{ steps.maven.outputs.artifact-name }}" >> $GITHUB_STEP_SUMMARY
-          echo "- Image    : ${{ steps.docker.outputs.image-full-ref }}" >> $GITHUB_STEP_SUMMARY
+      - name: Docker build
+        run: docker build -t test-maven-app:${{ github.sha }} .
