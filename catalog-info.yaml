@@ -1,0 +1,23 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: test-maven-app
+  description: Maven-based Java test application with Docker support and GitHub Actions CI
+  labels:
+    medica.io/product-area: infra
+    medica.io/build-system: github-actions
+    medica.io/runtime-language-version: java17
+    medica.io/third-party-dependencies: "true"
+  annotations:
+    github.com/project-slug: tusharkumarshahi/test-maven-app
+    backstage.io/techdocs-ref: dir:.
+    medica.io/runbook-url: https://runbooks.example.com/test-maven-app       # TODO: update URL
+    medica.io/oncall-service: demo-primary                                    # TODO: update on-call service name
+    medica.io/data-classification: internal
+    medica.io/criticality: low
+  tags: [java, maven, internal, demo]
+spec:
+  type: service
+  lifecycle: experimental
+  owner: group:default/demo-team
+  system: demo-platform
